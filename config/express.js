@@ -24,6 +24,37 @@ var fs = require('fs'),
 	consolidate = require('consolidate'),
 	path = require('path');
 
+	//User connect redis only for session management
+	//var RedisStore = require('connect-redis')(express);
+	//var RedisClient = RedisStore.createClient();
+
+	//User Redis for persistence other than session data
+	// var Lock = require('node-redis-lock');
+	// var redisExpLock = require('redis-exp-lock');
+
+	// var withLock = redisExpLock({redis: client});
+	// var redislock = require('redislock');
+
+
+
+	// client.on('connect', function() {
+ //    	console.log('connected to Redis!');
+	// });
+
+	// client.set('key', 'value', function(err, reply) {
+	//   console.log(reply);
+	// });
+
+	// client.hmset('myhash', {
+	//     'key1': 'value1',
+	//     'key2': 'value2'
+	// });
+	 
+	// client.hgetall('myhash', function(err, object) {
+	//     console.log(object);
+	// });
+
+
 module.exports = function(db) {
 	// Initialize express app
 	var app = express();
@@ -99,17 +130,27 @@ module.exports = function(db) {
 	app.use(cookieParser());
 
 	// Express MongoDB session storage
+
 	app.use(session({
 		saveUninitialized: true,
 		resave: true,
 		secret: config.sessionSecret,
 		store: new mongoStore({
 			db: db.connection.db,
-			collection: config.sessionCollection
+			collection: config.sessionCollection,
+			defaultExpirationTime:  1000*60*5
 		}),
 		cookie: config.sessionCookie,
 		name: config.sessionName
 	}));
+
+
+	// app.use(session({
+	//     store: new RedisStore({
+	//     	client : RedisClient
+	//     }),
+	//     secret: 'keyboard cat'
+	// }));
 
 	// use passport session
 	app.use(passport.initialize());

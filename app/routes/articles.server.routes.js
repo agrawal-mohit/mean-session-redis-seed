@@ -17,6 +17,15 @@ module.exports = function(app) {
 		.put(users.requiresLogin, articles.hasAuthorization, articles.update)
 		.delete(users.requiresLogin, articles.hasAuthorization, articles.delete);
 
+	app.route('/article/edit')
+		.get(articles.edit);
+
+	app.route('/cancelUpdate')
+		.get(articles.cancelUpdate)
+
+	app.route('/testRedis')
+		.post(articles.testRedis)
+
 	// Finish by binding the article middleware
 	app.param('articleId', articles.articleByID);
 };

@@ -2,8 +2,10 @@
 	<div class="page-header">
 		<h1 data-ng-bind="article.title"></h1>
 	</div>
-	<div class="pull-right" data-ng-show="authentication.user._id == article.user._id">
-		<a class="btn btn-primary" href="/#!/articles/{{article._id}}/edit">
+	<!-- <div class="pull-right" data-ng-show="authentication.user._id == article.user._id"> -->
+		<!-- <a class="btn btn-primary" href="/#!/articles/edit/{{article._id}}"> -->
+	<div class="pull-right">
+		<a class="btn btn-primary" ng-click="edit()" >
 			<i class="glyphicon glyphicon-edit"></i>
 		</a>
 		<a class="btn btn-primary" data-ng-click="remove();">
@@ -15,8 +17,9 @@
 			Posted on
 			<span data-ng-bind="article.created | date:'mediumDate'"></span>
 			by
-			<span data-ng-bind="article.user.displayName"></span>
+			<span data-ng-bind="article.userName"></span>
 		</em>
 	</small>
 	<p class="lead" data-ng-bind="article.content"></p>
+	<p style="color:red;">{{editError}}</p>
 </section>

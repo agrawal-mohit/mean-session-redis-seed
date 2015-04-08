@@ -1,8 +1,8 @@
 'use strict';
 
 // Articles controller
-angular.module('articles').controller('ArticlesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Articles',
-	function($scope, $stateParams, $location, Authentication, Articles) {
+angular.module('articles').controller('ArticlesController', ['$scope', '$http','$stateParams', '$location', 'Authentication', 'Articles',
+	function($scope, $http, $stateParams, $location, Authentication, Articles) {
 		$scope.authentication = Authentication;
 
 		// Create new Article
@@ -15,7 +15,7 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
 
 			// Redirect after save
 			article.$save(function(response) {
-				$location.path('articles/' + response._id);
+				$location.path('articles/' + response.id);
 
 				// Clear form fields
 				$scope.title = '';
@@ -42,14 +42,59 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
 			}
 		};
 
+		//edit article
+
+		$scope.edit = function() {
+			console.log($scope.article.id);
+			console.log($scope.authentication.user._id);
+
+			$http({
+			    url: '/article/edit',
+			    method: "GET",
+			    params: {'articleId' : $scope.article.id, 'userId' : $scope.authentication.user._id}
+			}).success(
+				function(response) {
+			        console.log(response);
+			        if(response.allowed){
+			        	location.href = '/#!/articles/' + $scope.article.id + '/edit';
+			        } else {
+			        	$scope.editError = response.msg;
+			        }
+			    }
+			).error(
+				function(error) { // optional
+			        console.log(error);
+			    }
+			);
+		};
+			
+
 		// Update existing Article
-		$scope.update = function() {
+		$scope.update = function(valid) {
+			
+			// client.del($scope.article._id, function(err, reply){
+			// 	alert(reply);
+			// })
+
 			var article = $scope.article;
 
 			article.$update(function() {
-				$location.path('articles/' + article._id);
+				$location.path('articles/' + article.id);
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
+			});
+		};
+
+		$scope.cancelUpdate = function(){
+			var articleId = $scope.article.id;
+			$http({
+			    url: '/cancelUpdate',
+			    method: "GET",
+			    params: {'articleId' : articleId}
+			}).success(function(){
+				location.href = "#!/articles/"+ articleId;
+			}).error(function(err){
+				$scope.error = err;
 			});
 		};
 
@@ -64,5 +109,8 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
 				articleId: $stateParams.articleId
 			});
 		};
+
+
+
 	}
 ]);

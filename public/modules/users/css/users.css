@@ -12,3 +12,29 @@
 	right: 10px;
 	position: absolute;
 }
+
+label > input{ /* HIDE RADIO */
+	display:none;
+}
+label > input + img{ /* IMAGE STYLES */
+  cursor:pointer;
+  border:2px solid transparent;
+}
+
+.basic-panel{
+	padding: 0px;
+}
+
+.ldap-panel{
+	padding: 0px;
+	float: right;	
+}
+
+.field-container{
+
+	padding: 10px;
+}
+
+.forgot-password{
+	text-align: center;
+}

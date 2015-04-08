@@ -7,7 +7,8 @@ var _ = require('lodash'),
 	errorHandler = require('../errors.server.controller'),
 	mongoose = require('mongoose'),
 	passport = require('passport'),
-	User = mongoose.model('User');
+	User = mongoose.model('User'),
+	Session = mongoose.model('Session');
 
 /**
  * Signup
@@ -39,6 +40,8 @@ exports.signup = function(req, res) {
 				if (err) {
 					res.status(400).send(err);
 				} else {
+					console.log('User session created!');
+					req.session.username = user.username;
 					res.json(user);
 				}
 			});
@@ -46,33 +49,54 @@ exports.signup = function(req, res) {
 	});
 };
 
+
 /**
  * Signin after passport authentication
  */
-exports.signin = function(req, res, next) {
-	passport.authenticate('local', function(err, user, info) {
-		if (err || !user) {
-			res.status(400).send(info);
-		} else {
-			// Remove sensitive data before login
-			user.password = undefined;
-			user.salt = undefined;
 
-			req.login(user, function(err) {
-				if (err) {
-					res.status(400).send(err);
+exports.signin = function(req, res, next) {
+	
+	var strategy = req.body.strategy;
+	var username = req.body.username;
+	var overwrite = req.body.overwrite;
+	var domain = username.split('@')[1];
+	
+	//if(domain=='musigma.com')
+	Session.findOne({'session' : new RegExp(username, 'i')}, function(err, session){
+		if(session && !overwrite) {
+			console.log("Session exists!");
+			console.log(session);
+			res.status(400).send('Session exists');
+		} else {
+			if(session) Session.find({'session' : new RegExp(username, 'i')}).remove().exec();
+			passport.authenticate(strategy, function(err, user, info) {
+				if (err || !user) {
+					res.status(400).send(info);
 				} else {
-					res.json(user);
+					// Remove sensitive data before login
+					user.password = undefined;
+					user.salt = undefined;
+					req.login(user, function(err) {
+						if (err) {
+							res.status(400).send(err);
+						} else {
+							console.log('User session created!');
+							req.session.username = user.username;
+							res.json(user);
+						}
+					});
 				}
-			});
+			})(req, res, next);	
 		}
-	})(req, res, next);
+	});
 };
+
 
 /**
  * Signout
  */
 exports.signout = function(req, res) {
+	req.session.username = '';
 	req.logout();
 	res.redirect('/');
 };
