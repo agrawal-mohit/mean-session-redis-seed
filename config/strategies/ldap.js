@@ -15,8 +15,8 @@ module.exports = function() {
 			ldap: {
 				    url:             'ldap://10.1.2.3:389',
 				    base:            'DC=mu-sigma,DC=local',
-				    bindDN:          'CN=Ldap AD,OU=Service_Accounts,OU=Aviator,OU=Sites,DC=mu-sigma,DC=local',
-				    bindCredentials: '@ct!ve@1234'
+				    bindDN:          'CN=,OU=Service_Accounts,OU=Aviator,OU=Sites,DC=mu-sigma,DC=local',
+				    bindCredentials: ''
 				  },
 			integrated:false,
 		},
